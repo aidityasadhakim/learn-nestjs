@@ -3,15 +3,15 @@ import { LoginUserDto } from './dto/login-user.dto';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateUserDto } from './dto/create-users.dto';
-import UsersAuth from './dto/users-auth.dto';
 import IUsers from '../users/dto/user.dto';
+import { Users } from '../users/schemas/user.schema';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
   constructor(@InjectModel('Users') private usersModel: Model<IUsers>) {}
 
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto): Promise<Users> {
     const checkUser = await this.usersModel.findOne({
       username: createUserDto.username.toLowerCase(),
     });
@@ -36,7 +36,7 @@ export class AuthService {
     return userCreated;
   }
 
-  async login(loginUserDto: LoginUserDto) {
+  async login(loginUserDto: LoginUserDto): Promise<Users> {
     const checkUser = await this.usersModel
       .findOne({
         username: loginUserDto.username.toLowerCase(),
