@@ -1,44 +1,32 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-users.dto';
-import { User } from './entities/user.entity';
+// import IUsers from './interfaces/users.interface';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import * as bcrypt from 'bcrypt';
+import IUsers from './dto/user.dto';
 
 @Injectable()
 export class UsersService {
-  private users: User[] = [
-    {
-      id: 0,
-      name: 'John',
-    },
-    {
-      id: 1,
-      name: 'Jane',
-    },
-    {
-      id: 2,
-      name: 'Mary',
-    },
-  ];
+  constructor(@InjectModel('Users') private usersModel: Model<IUsers>) {}
 
-  findAll(name: string): User[] {
-    if (name) {
-      return this.users.filter((user) => user.name.includes(name));
+  async findAll(): Promise<IUsers[]> {
+    const usersData = await this.usersModel.find();
+
+    if (!usersData) {
+      throw new NotFoundException('Students are not found');
     }
 
-    return this.users;
+    return usersData;
   }
 
-  findById(UserId: number): User {
-    return this.users.find((user) => user.id === UserId);
-  }
+  async findById(UserId: string): Promise<IUsers> {
+    const user = await this.usersModel.findById(UserId);
 
-  createUser(createUserDto: CreateUserDto): User {
-    const newUser = {
-      id: Date.now(),
-      ...createUserDto,
-    };
+    if (!user) {
+      throw new NotFoundException('Student is not found');
+    }
 
-    this.users.push(newUser);
-
-    return newUser;
+    return user;
   }
 }

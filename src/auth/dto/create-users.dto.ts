@@ -4,9 +4,9 @@ import {
   MaxLength,
   IsString,
   IsNotEmpty,
-  IsNumber,
-  MinLength,
   Length,
+  IsLowercase,
+  NotContains,
 } from 'class-validator';
 
 export class CreateUserDto {
@@ -21,11 +21,13 @@ export class CreateUserDto {
   @IsNotEmpty()
   @IsString()
   @MaxLength(255)
+  @IsLowercase()
+  @NotContains(' ')
   username: string;
 
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  @Length(8, 255)
+  @Length(6, 255)
   password: string;
 }
